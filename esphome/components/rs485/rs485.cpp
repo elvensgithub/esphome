@@ -115,7 +115,7 @@ void RS485Component::loop() {
             }
 
         #ifdef ESPHOME_LOG_HAS_VERY_VERBOSE
-            ESP_LOGVV(TAG, "Receive data-> %s, Gap Time: %lums", hexencode(&rx_buffer_[0], rx_bytesRead_).c_str(), millis() - rx_lastTime_);
+            ESP_LOGVV(TAG, "Receive dataAAAAAAA-> %s, Gap Time: %lums", hexencode(&rx_buffer_[0], rx_bytesRead_).c_str(), millis() - rx_lastTime_);
         #else
             #ifdef ESPHOME_LOG_HAS_VERBOSE
             if (!found) {
