@@ -317,7 +317,7 @@ uint8_t RS485Component::make_checksum(const uint8_t *data, const num_t len) cons
             }else{
                 crc ^= data[i];
             }
-        crc ^=0x80 //마지막에 0x80 XOR
+        crc ^=0x80; //마지막에 0x80 XOR
         return crc;
     }
 }
