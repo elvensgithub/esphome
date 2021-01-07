@@ -147,7 +147,7 @@ void RS485Component::rx_proc() {
                 
                 if(suffix_.has_value() && rx_bytesRead_ > prefix_len_+suffix_len_ && compare(&rx_buffer_[0], rx_bytesRead_, &suffix_.value()[0], suffix_len_, rx_bytesRead_-suffix_len_)) return;
 
-                ESP_LOGVV(TAG, "rx_proc [rto]%d, [myd1]%d -> [rx_bytesRead]%d, [rx_buffer]%s"rx_timeOut_, myd1, rx_bytesRead_, hexencode(&rx_buffer_[0], rx_bytesRead_).c_str()); //DEBUG
+                ESP_LOGVV(TAG, "rx_proc [rto]%d, [myd1]%d -> [rx_bytesRead]%d, [rx_buffer]%s", rx_timeOut_, myd1, rx_bytesRead_, hexencode(&rx_buffer_[0], rx_bytesRead_).c_str()); //DEBUG
             }
             else
                 this->hw_serial_->read();  // when the buffer is full, just read remaining input, but do not store...
