@@ -115,7 +115,7 @@ void RS485Component::loop() {
             }
 
         #ifdef ESPHOME_LOG_HAS_VERY_VERBOSE
-            ESP_LOGVV(TAG, "Receive dataAAAAAAA-> %s, Gap Time: %lums", hexencode(&rx_buffer_[0], rx_bytesRead_).c_str(), millis() - rx_lastTime_);
+            ESP_LOGVV(TAG, "Receive data-> %s, Gap Time: %lums", hexencode(&rx_buffer_[0], rx_bytesRead_).c_str(), millis() - rx_lastTime_);
         #else
             #ifdef ESPHOME_LOG_HAS_VERBOSE
             if (!found) {
@@ -139,16 +139,21 @@ void RS485Component::rx_proc() {
     rx_bytesRead_ = 0;
     while (rx_timeOut_ > 0)
     {
+        int myd1 = 1; //DEBUG
         while (this->hw_serial_->available()) {
             if (rx_bytesRead_ < BUFFER_SIZE) {
                 rx_buffer_[rx_bytesRead_] = this->hw_serial_->read();
                 rx_bytesRead_++;
                 
                 if(suffix_.has_value() && rx_bytesRead_ > prefix_len_+suffix_len_ && compare(&rx_buffer_[0], rx_bytesRead_, &suffix_.value()[0], suffix_len_, rx_bytesRead_-suffix_len_)) return;
+
+                ESP_LOGVV(TAG, "rx_proc %d -> [rx_bytesRead] %d, [rx_buffer] %s",myd1, rx_bytesRead_, hexencode(&rx_buffer_[0], rx_bytesRead_).c_str()); //DEBUG
             }
             else
                 this->hw_serial_->read();  // when the buffer is full, just read remaining input, but do not store...
             rx_timeOut_ = conf_rx_wait_; // if serial received, reset timeout counter
+
+            myd1++; //DEBUG
         }
         delay(1);
         rx_timeOut_--;
