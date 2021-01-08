@@ -297,7 +297,7 @@ bool RS485Component::validate(const uint8_t *data, const num_t len) {
     }
     uint8_t crc = checksum_ ? make_checksum(&data[prefix_len_], len-prefix_len_-suffix_len_-checksum_len_) : 0;
     if(checksum_ && crc != data[len-suffix_len_-checksum_len_]) {
-        ESP_LOGW(TAG, "[Read] Checksum error: %s, CRC= %s", hexencode(&data[0], len).c_str(),crc); // CRC출력 추가
+        ESP_LOGW(TAG, "[Read] Checksum error: %s, CRC= %s", hexencode(&data[0], len).c_str(),hexencode(crc, 1).c_str()); // CRC출력 추가
         return false;
     }
     if(checksum2_ && make_checksum2(&data[prefix_len_], len-prefix_len_-suffix_len_-checksum_len_, crc) != data[len-suffix_len_-1]) {
