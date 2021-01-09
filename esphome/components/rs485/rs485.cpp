@@ -319,7 +319,7 @@ uint8_t RS485Component::make_checksum(const uint8_t *data, const num_t len) cons
             for(num_t i=0; i<this->prefix_len_; i++)
                 crc ^= this->prefix_.value()[i];
         for(num_t i=0; i<len; i++)
-            if(data[i]==0xFF){  //0xFF 패킷은 XOR 제외
+            if(hexencode(&data[i], len).c_str()=="0xFF"){  //0xFF 패킷은 XOR 제외
                 crc = crc;
             }else{
                 crc ^= data[i];
