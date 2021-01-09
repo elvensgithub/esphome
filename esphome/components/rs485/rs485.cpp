@@ -315,15 +315,13 @@ uint8_t RS485Component::make_checksum(const uint8_t *data, const num_t len) cons
     else {
         // CheckSum8 Xor //삼성패킷에 맞춰서 수정
         uint8_t crc = 0;
+        uint8_t not_crc = 0xFF;
         if(this->prefix_.has_value())
             for(num_t i=0; i<this->prefix_len_; i++)
                 crc ^= this->prefix_.value()[i];
         for(num_t i=0; i<len; i++)
-            if(hexencode(&data[i], len).c_str()=="0xFF"){  //0xFF 패킷은 XOR 제외
-                crc = crc;
-            }else{
-                crc ^= data[i];
-            }
+            if(data[i] != not_crc) crc ^= data[i];  //0xFF 패킷은 XOR 제외
+            else uint8_t not_crc = 0xFF; //0xFF 패킷은 XOR 제외
         crc ^=0x80; //마지막에 0x80 XOR
         return crc;
     }
