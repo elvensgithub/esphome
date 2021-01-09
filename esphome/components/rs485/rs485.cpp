@@ -316,6 +316,7 @@ uint8_t RS485Component::make_checksum(const uint8_t *data, const num_t len) cons
         // CheckSum8 Xor //삼성패킷에 맞춰서 수정
         uint8_t crc = 0;
         uint8_t not_crc = 0xFF;
+        uint8_t suf_crc = 0x80;
         if(this->prefix_.has_value())
             for(num_t i=0; i<this->prefix_len_; i++)
                 crc ^= this->prefix_.value()[i];
@@ -327,8 +328,9 @@ uint8_t RS485Component::make_checksum(const uint8_t *data, const num_t len) cons
                 uint8_t not_crc = 0xFF; //0xFF 패킷은 XOR 제외
                 ESP_LOGV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
             }         
-        crc ^=0x80; //마지막에 0x80 XOR
-        ESP_LOGV(TAG, "make CRC (not_crc)0x%02X, (crc)0x%02X", not_crc,crc); //DEBUG
+        ESP_LOGV(TAG, "make CRC (crc)0x%02X, (suf_crc)0x%02X", crc,suf_crc); //DEBUG
+        crc ^=suf_crc; //마지막에 0x80 XOR
+        ESP_LOGV(TAG, "make CRC (crc)0x%02X, (suf_crc)0x%02X", crc,suf_crc); //DEBUG
         return crc;
     }
 }
