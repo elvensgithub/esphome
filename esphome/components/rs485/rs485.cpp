@@ -328,7 +328,7 @@ uint8_t RS485Component::make_checksum(const uint8_t *data, const num_t len) cons
                 ESP_LOGVV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
             }         
         crc ^=0x80; //마지막에 0x80 XOR
-        ESP_LOGVV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
+        ESP_LOGVV(TAG, "make CRC (not_crc)0x%02X, (crc)0x%02X", not_crc,crc); //DEBUG
         return crc;
     }
 }
