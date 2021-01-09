@@ -320,14 +320,18 @@ uint8_t RS485Component::make_checksum(const uint8_t *data, const num_t len) cons
         if(this->prefix_.has_value())
             for(num_t i=0; i<this->prefix_len_; i++)
                 crc ^= this->prefix_.value()[i];
-        for(num_t i=0; i<len; i++)
-            if(data[i] != not_crc){
-                crc ^= data[i];  //0xFF 패킷은 XOR 제외
-                ESP_LOGV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
-            }else{
-                uint8_t not_crc = 0xFF; //0xFF 패킷은 XOR 제외
-                ESP_LOGV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
-            }         
+        for(num_t i=0; i<len; i++){
+            crc ^= data[i];
+            ESP_LOGV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
+        }
+            
+            //if(data[i] != not_crc){
+            //    crc ^= data[i];  //0xFF 패킷은 XOR 제외
+            //}else{
+            //    uint8_t not_crc = 0xFF; //0xFF 패킷은 XOR 제외
+            //    ESP_LOGV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
+            //}    
+                 
         ESP_LOGV(TAG, "make CRC (crc)0x%02X, (suf_crc)0x%02X", crc,suf_crc); //DEBUG
         //crc ^=suf_crc; //마지막에 0x80 XOR
         if(crc >= suf_crc){  //1번째 비트를 1로 세팅
