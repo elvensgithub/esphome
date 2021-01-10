@@ -184,7 +184,7 @@ void RS485Component::rx_proc() {
 //                   packet_lenth = 4;
 //                    ESP_LOGV(TAG, "packet head ctrl : (rx_bytesRead_)%d, (packet_lenth)%d",rx_bytesRead_,packet_lenth); //DEBUG
 //                    return;
-                }
+//                }
             }
             else
                 this->hw_serial_->read();  // when the buffer is full, just read remaining input, but do not store...
