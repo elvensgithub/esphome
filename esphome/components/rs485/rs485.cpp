@@ -158,10 +158,9 @@ void RS485Component::rx_proc() {
     rx_bytesRead_ = 0;
 
     int packet_lenth = 4; //기본 패킷길이는 4로 세팅
-
     uint8_t packet_head1_data[7] = {0xAC,0xAC,0xAE,0xAE,0xAE,0xC2,0xC2};
     uint8_t packet_head2_data[7] = {0x79,0x7A,0x7C,0x7D,0x7F,0x4E,0x4F};
-    int packet_head1_len[3] = {5,5,8,8,8,6,6};
+    int packet_head1_len[7] = {5,5,8,8,8,6,6};
 
     while (rx_timeOut_ > 0)
     {
@@ -171,7 +170,6 @@ void RS485Component::rx_proc() {
                 rx_bytesRead_++;
                 
                 if(suffix_.has_value() && rx_bytesRead_ > prefix_len_+suffix_len_ && compare(&rx_buffer_[0], rx_bytesRead_, &suffix_.value()[0], suffix_len_, rx_bytesRead_-suffix_len_)) return;
-                //ESP_LOGV(TAG, "rx_proc [rto]%d, [myd1]%d -> [rx_bytesRead]%d, [rx_buffer]%s", rx_timeOut_, myd1, rx_bytesRead_, hexencode(&rx_buffer_[0], rx_bytesRead_).c_str()); //DEBUG
 
                 for(num_t i=0; i<3; i++){
                     if(rx_buffer_[0] == packet_head1_data[i]){
@@ -183,22 +181,20 @@ void RS485Component::rx_proc() {
                 }
                 if(rx_bytesRead_ == packet_lenth){
                     ESP_LOGV(TAG, "packet head ctrl : (rx_bytesRead_)%d, (packet_lenth)%d",rx_bytesRead_,packet_lenth); //DEBUG
-                   packet_lenth = 4;
+                    packet_lenth = 4;
                     ESP_LOGV(TAG, "packet head ctrl : (rx_bytesRead_)%d, (packet_lenth)%d",rx_bytesRead_,packet_lenth); //DEBUG
                     return;
                 }
             }
-            else
+            else{
                 this->hw_serial_->read();  // when the buffer is full, just read remaining input, but do not store...
+            }
             rx_timeOut_ = conf_rx_wait_; // if serial received, reset timeout counter
 
-            //myd1++; //DEBUG
         }
         delay(1);
         rx_timeOut_--;
-        //ESP_LOGVV(TAG, "rx_proc after while hw available [rx_timeout]%d, [rx_bytesRead]%d, [rx_buffer]%s",rx_timeOut_, rx_bytesRead_, hexencode(&rx_buffer_[0], rx_bytesRead_).c_str()); //DEBUG
     }
-    //ESP_LOGVV(TAG, "rx_proc after while [rx timeout]%d, [rx_bytesRead] %d, [rx_buffer] %s",rx_timeOut_, rx_bytesRead_, hexencode(&rx_buffer_[0], rx_bytesRead_).c_str()); //DEBUG
 }
 
 void RS485Component::tx_proc() {
