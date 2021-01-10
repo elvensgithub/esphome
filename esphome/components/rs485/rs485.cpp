@@ -159,8 +159,8 @@ void RS485Component::rx_proc() {
 
     int packet_lenth = 4; //기본 패킷길이는 4로 세팅
 
-    const uint8_t *packet_head1_data[3] = {0xAC,0xAE,0xC2};
-    const int *packet_head1_len[3] = {5,8,6};
+    uint8_t packet_head1_data[3] = {0xAC,0xAE,0xC2};
+    int packet_head1_len[3] = {5,8,6};
 
     while (rx_timeOut_ > 0)
     {
