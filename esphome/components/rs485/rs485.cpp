@@ -157,10 +157,11 @@ void RS485Component::rx_proc() {
     rx_timeOut_ = conf_rx_wait_;
     rx_bytesRead_ = 0;
 
-    int packet_lenth = 4; //기본 패킷길이는 4로 세팅
+//    int packet_lenth = 4; //기본 패킷길이는 4로 세팅
 
-    uint8_t packet_head1_data[3] = {0xAC,0xAE,0xC2};
-    int packet_head1_len[3] = {5,8,6};
+//    uint8_t packet_head1_data[3] = {0xAC,0xAE,0xC2};
+//    uint8_t packet_head2_data[3] = {0xAC,0xAE,0xC2};
+//    int packet_head1_len[3] = {5,8,6};
 
     while (rx_timeOut_ > 0)
     {
@@ -172,17 +173,17 @@ void RS485Component::rx_proc() {
                 if(suffix_.has_value() && rx_bytesRead_ > prefix_len_+suffix_len_ && compare(&rx_buffer_[0], rx_bytesRead_, &suffix_.value()[0], suffix_len_, rx_bytesRead_-suffix_len_)) return;
                 //ESP_LOGV(TAG, "rx_proc [rto]%d, [myd1]%d -> [rx_bytesRead]%d, [rx_buffer]%s", rx_timeOut_, myd1, rx_bytesRead_, hexencode(&rx_buffer_[0], rx_bytesRead_).c_str()); //DEBUG
 
-                for(num_t i=0; i<3; i++){
-                    if(rx_buffer_[0] == packet_head1_data[i]){
-                        packet_lenth = packet_head1_len[i];
-                        ESP_LOGV(TAG, "packet head ctrl : (rx_buffer_[0])0x%02X, (packet_head1_data[%d])0x%02X, (packet_lenth)%d",rx_buffer_[0],i,packet_head1_data[i],packet_lenth); //DEBUG
-                    }    //ESP_LOGV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
-                }
-                if(rx_bytesRead_ == packet_lenth){
-                    ESP_LOGV(TAG, "packet head ctrl : (rx_bytesRead_)%d, (packet_lenth)%d",rx_bytesRead_,packet_lenth); //DEBUG
-                    packet_lenth = 4;
-                    ESP_LOGV(TAG, "packet head ctrl : (rx_bytesRead_)%d, (packet_lenth)%d",rx_bytesRead_,packet_lenth); //DEBUG
-                    return;
+//                for(num_t i=0; i<3; i++){
+//                    if(rx_buffer_[0] == packet_head1_data[i]){
+//                        packet_lenth = packet_head1_len[i];
+//                        ESP_LOGV(TAG, "packet head ctrl : (rx_buffer_[0])0x%02X, (packet_head1_data[%d])0x%02X, (packet_lenth)%d",rx_buffer_[0],i,packet_head1_data[i],packet_lenth); //DEBUG
+//                    }    //ESP_LOGV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
+//                }
+//                if(rx_bytesRead_ == packet_lenth){
+//                    ESP_LOGV(TAG, "packet head ctrl : (rx_bytesRead_)%d, (packet_lenth)%d",rx_bytesRead_,packet_lenth); //DEBUG
+//                   packet_lenth = 4;
+//                    ESP_LOGV(TAG, "packet head ctrl : (rx_bytesRead_)%d, (packet_lenth)%d",rx_bytesRead_,packet_lenth); //DEBUG
+//                    return;
                 }
             }
             else
