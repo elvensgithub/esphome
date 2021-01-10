@@ -160,6 +160,7 @@ void RS485Component::rx_proc() {
     int packet_lenth = 4; //기본 패킷길이는 4로 세팅
     uint8_t packet_head1_data[7] = {0xAC,0xAC,0xAE,0xAE,0xAE,0xC2,0xC2};
     uint8_t packet_head2_data[7] = {0x79,0x7A,0x7C,0x7D,0x7F,0x4E,0x4F};
+    uint8_t packet_ack = 0xB0;
     int packet_head1_len[7] = {5,5,8,8,8,6,6};
 
     while (rx_timeOut_ > 0)
@@ -172,7 +173,7 @@ void RS485Component::rx_proc() {
                 if(suffix_.has_value() && rx_bytesRead_ > prefix_len_+suffix_len_ && compare(&rx_buffer_[0], rx_bytesRead_, &suffix_.value()[0], suffix_len_, rx_bytesRead_-suffix_len_)) return;
 
                 for(num_t i=0; i<3; i++){
-                    if(rx_buffer_[0] == packet_head1_data[i]){
+                    if((rx_buffer_[0] == packet_ack)||(rx_buffer_[0] == packet_head1_data[i])){
                         if(rx_buffer_[1] == packet_head2_data[i]){
                             packet_lenth = packet_head1_len[i];
                             ESP_LOGV(TAG, "packet head ctrl : (rx_buffer_[0])0x%02X, (packet_head1_data[%d])0x%02X,(packet_head2_data[%d])0x%02X, (packet_lenth)%d",rx_buffer_[0],i,packet_head1_data[i],i,packet_head2_data[i],packet_lenth); //DEBUG
