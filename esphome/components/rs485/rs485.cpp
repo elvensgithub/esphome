@@ -151,7 +151,6 @@ void RS485Component::loop() {
     B0	4E		6	환기 상태 응답
     B0	4F		6	환기 제어 응답
 */
-
 void RS485Component::rx_proc() {
     memset(&rx_buffer_, 0, BUFFER_SIZE) ;
     rx_timeOut_ = conf_rx_wait_;
@@ -176,14 +175,11 @@ void RS485Component::rx_proc() {
                     if((rx_buffer_[0] == packet_ack)||(rx_buffer_[0] == packet_head1_data[i])){
                         if(rx_buffer_[1] == packet_head2_data[i]){
                             packet_lenth = packet_head1_len[i];
-                            ESP_LOGV(TAG, "packet head ctrl : (rx_buffer_[0])0x%02X, (packet_head1_data[%d])0x%02X,(packet_head2_data[%d])0x%02X, (packet_lenth)%d",rx_buffer_[0],i,packet_head1_data[i],i,packet_head2_data[i],packet_lenth); //DEBUG
                         }
                     }    
                 }
                 if(rx_bytesRead_ == packet_lenth){
-                    ESP_LOGV(TAG, "packet head ctrl : (rx_bytesRead_)%d, (packet_lenth)%d",rx_bytesRead_,packet_lenth); //DEBUG
                     packet_lenth = 4;
-                    ESP_LOGV(TAG, "packet head ctrl : (rx_bytesRead_)%d, (packet_lenth)%d",rx_bytesRead_,packet_lenth); //DEBUG
                     return;
                 }
             }
@@ -197,6 +193,7 @@ void RS485Component::rx_proc() {
         rx_timeOut_--;
     }
 }
+// DEBUG BCK >> ESP_LOGV(TAG, "packet head ctrl : (rx_buffer_[0])0x%02X, (packet_head1_data[%d])0x%02X,(packet_head2_data[%d])0x%02X, (packet_lenth)%d",rx_buffer_[0],i,packet_head1_data[i],i,packet_head2_data[i],packet_lenth); 
 
 void RS485Component::tx_proc() {
 
