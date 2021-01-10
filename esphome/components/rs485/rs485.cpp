@@ -133,21 +133,57 @@ void RS485Component::loop() {
     }
 }
 
+
+/*
+    AC	79		5	조명 상태 요청
+    AC	7A		5	조명 제어 요청
+    AE	7C		8	난방 상태 요청
+    AE	7D		8	난방 제어 요청
+    AE	7F		8	난방 온도 설정 요청
+    C2	4E		6	환기 상태 요청
+    C2	4F		6	환기 제어 요청
+
+    B0	79		5	조명 상태 응답
+    B0	7A		5	조명 제어 응답
+    B0	7C		8	난방 상태 응답
+    B0	7D		8	난방 제어 응답
+    B0	7F		8	난방 온도 설정 응답
+    B0	4E		6	환기 상태 응답
+    B0	4F		6	환기 제어 응답
+*/
+
 void RS485Component::rx_proc() {
     memset(&rx_buffer_, 0, BUFFER_SIZE) ;
     rx_timeOut_ = conf_rx_wait_;
     rx_bytesRead_ = 0;
+
+    int packet_lenth = 4; //기본 패킷길이는 4로 세팅
+
+    const uint8_t *packet_head1_data[3] = {0xAC,0xAE,0xC2};
+    const int *packet_head1_len[3] = {5,8,6};
+
     while (rx_timeOut_ > 0)
     {
-        //int myd1 = 1; //DEBUG
         while (this->hw_serial_->available()) {
             if (rx_bytesRead_ < BUFFER_SIZE) {
                 rx_buffer_[rx_bytesRead_] = this->hw_serial_->read();
                 rx_bytesRead_++;
                 
                 if(suffix_.has_value() && rx_bytesRead_ > prefix_len_+suffix_len_ && compare(&rx_buffer_[0], rx_bytesRead_, &suffix_.value()[0], suffix_len_, rx_bytesRead_-suffix_len_)) return;
+                //ESP_LOGV(TAG, "rx_proc [rto]%d, [myd1]%d -> [rx_bytesRead]%d, [rx_buffer]%s", rx_timeOut_, myd1, rx_bytesRead_, hexencode(&rx_buffer_[0], rx_bytesRead_).c_str()); //DEBUG
 
-                //ESP_LOGVV(TAG, "rx_proc [rto]%d, [myd1]%d -> [rx_bytesRead]%d, [rx_buffer]%s", rx_timeOut_, myd1, rx_bytesRead_, hexencode(&rx_buffer_[0], rx_bytesRead_).c_str()); //DEBUG
+                for(num_t i=0; i<3; i++){
+                    if(rx_buffer_[0] == packet_head1_data[i]){
+                        packet_lenth = packet_head1_len[i];
+                        ESP_LOGV(TAG, "packet head ctrl : (rx_buffer_[0])0x%02X, (packet_head1_data[%d])0x%02X, (packet_lenth)%d",rx_buffer_[0],i,packet_head1_data[i],packet_lenth); //DEBUG
+                    }    //ESP_LOGV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
+                }
+                if(rx_bytesRead_ == packet_lenth){
+                    ESP_LOGV(TAG, "packet head ctrl : (rx_bytesRead_)%d, (packet_lenth)%d",rx_bytesRead_,packet_lenth); //DEBUG
+                    packet_lenth = 4;
+                    ESP_LOGV(TAG, "packet head ctrl : (rx_bytesRead_)%d, (packet_lenth)%d",rx_bytesRead_,packet_lenth); //DEBUG
+                    return;
+                }
             }
             else
                 this->hw_serial_->read();  // when the buffer is full, just read remaining input, but do not store...
@@ -322,22 +358,12 @@ uint8_t RS485Component::make_checksum(const uint8_t *data, const num_t len) cons
                 crc ^= this->prefix_.value()[i];
         for(num_t i=0; i<len; i++){
             crc ^= data[i];
-            ESP_LOGV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
+            //ESP_LOGV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
         }
-            
-            //if(data[i] != not_crc){
-            //    crc ^= data[i];  //0xFF 패킷은 XOR 제외
-            //}else{
-            //    uint8_t not_crc = 0xFF; //0xFF 패킷은 XOR 제외
-            //    ESP_LOGV(TAG, "make CRC (data[%d])0x%02X, (not_crc)0x%02X, (crc)0x%02X",i,data[i], not_crc,crc); //DEBUG
-            //}    
-                 
-        ESP_LOGV(TAG, "make CRC (crc)0x%02X, (suf_crc)0x%02X", crc,suf_crc); //DEBUG
-        //crc ^=suf_crc; //마지막에 0x80 XOR
         if(crc >= suf_crc){  //1번째 비트를 1로 세팅
             crc -= suf_crc;
-        }
-        ESP_LOGV(TAG, "make CRC (crc)0x%02X, (suf_crc)0x%02X", crc,suf_crc); //DEBUG
+        }           
+        //ESP_LOGV(TAG, "make CRC (crc)0x%02X, (suf_crc)0x%02X", crc,suf_crc); //DEBUG
         return crc;
     }
 }
