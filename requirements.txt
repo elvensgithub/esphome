@@ -11,4 +11,4 @@ pyserial==3.5
 ifaddr==0.1.7
 platformio>=6.1.6
 esptool==2.8
-click==7.1.2
+click==8.0.4
